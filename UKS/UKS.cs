@@ -1,15 +1,16 @@
-﻿
-namespace UKS;
+﻿namespace UKS;
 using Pluralize.NET;
 
 
 /// <summary>
 /// Contains a collection of Things linked by Relationships to implement Common Sense and general knowledge.
 /// </summary>
-public partial class UKS
+public partial class UKS : IDisposable
 {
     //This is the actual internal Universal Knowledge Store
     static private List<Thing> uKSList = new() { Capacity = 1000000, };
+    // Turn-based concurrency: single global lock to serialize graph mutations
+    public static readonly object GraphTurnLock = new object();
 
 
     //This is a temporary copy of the UKS which used internally during the save and restore process to 
@@ -30,16 +31,25 @@ public partial class UKS
     /// </summary>
     public UKS(bool clear = false)
     {
-        if (UKSList.Count == 0 || clear)
+        lock (GraphTurnLock)
         {
-            UKSList.Clear();
-            ThingLabels.ClearLabelList();
-            CreateInitialStructure();
-        }
-        UKSTemp.Clear();
+            if (UKSList.Count == 0 || clear)
+            {
+                // Dispose existing timer if it exists
+                stateTimer?.Dispose();
+                
+                // Clear all static state
+                uKSList.Clear();
+                transientRelationships.Clear();
+                ThingLabels.ClearLabelList();
+                
+                CreateInitialStructure();
+            }
+            UKSTemp.Clear();
 
-        var autoEvent = new AutoResetEvent(false);
-        stateTimer = new Timer(RemoveExpiredRelationships, autoEvent, 0, 1000);
+            var autoEvent = new AutoResetEvent(false);
+            stateTimer = new Timer(RemoveExpiredRelationships, autoEvent, 0, 1000);
+        }
     }
 
     static bool isRunning = false;
@@ -624,5 +634,32 @@ public partial class UKS
         rRoot.AddClause(clauseType, rTemp);
         rRoot.isStatement = false;
         return rRoot;
+    }
+
+    private bool disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                // Dispose managed resources
+                stateTimer?.Dispose();
+                stateTimer = null;
+            }
+            disposed = true;
+        }
+    }
+
+    ~UKS()
+    {
+        Dispose(false);
     }
 }

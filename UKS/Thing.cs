@@ -371,10 +371,33 @@ public partial class Thing
     //TODO reverse the parameters so it's type,target
     private Relationship HasRelationship(Thing target, Thing relationshipType, bool isStatement = true)
     {
-        foreach (Relationship r in relationships)
+        lock(UKS.GraphTurnLock)
         {
-            if (r.source == this && r.target == target && r.reltype == relationshipType && r.isStatement == isStatement)
-                return r;
+            // Create a snapshot array to avoid enumeration issues
+            Relationship[] snapshot;
+            if (relationships != null && relationships.Count > 0)
+            {
+                snapshot = new Relationship[relationships.Count];
+                try
+                {
+                    relationships.CopyTo(snapshot);
+                }
+                catch
+                {
+                    // If CopyTo fails due to concurrent modification, iterate safely
+                    snapshot = relationships.ToArray();
+                }
+            }
+            else
+            {
+                snapshot = new Relationship[0];
+            }
+            
+            foreach (Relationship r in snapshot)
+            {
+                if (r != null && r.source == this && r.target == target && r.reltype == relationshipType && r.isStatement == isStatement)
+                    return r;
+            }
         }
         return null;
     }
