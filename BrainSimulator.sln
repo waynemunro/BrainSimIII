@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11018.127 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainSimulator", "BrainSimulator\BrainSimulator.csproj", "{C08F318A-B8E6-4187-9ED4-0A126B3B63A9}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PythonProj", "PythonProj\PythonProj.pyproj", "{CA6D501B-6295-42CF-A444-AAFE9525A0EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrainSimMAC", "BrainSimMAC\BrainSimMAC.csproj", "{56FEB147-FC89-4712-939B-A6C08D5B2126}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrainSimIII.Tests", "BrainSimIII.Tests\BrainSimIII.Tests.csproj", "{C2C15100-39D6-C685-15C7-40D48F94B17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,18 @@ Global
 		{56FEB147-FC89-4712-939B-A6C08D5B2126}.Release|x64.Build.0 = Release|Any CPU
 		{56FEB147-FC89-4712-939B-A6C08D5B2126}.Release|x86.ActiveCfg = Release|Any CPU
 		{56FEB147-FC89-4712-939B-A6C08D5B2126}.Release|x86.Build.0 = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|x64.Build.0 = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Debug|x86.Build.0 = Debug|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|x64.ActiveCfg = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|x64.Build.0 = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|x86.ActiveCfg = Release|Any CPU
+		{C2C15100-39D6-C685-15C7-40D48F94B17B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

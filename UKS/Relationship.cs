@@ -7,8 +7,51 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Windows;
+using System.Linq;
 
 namespace UKS;
+
+/// <summary>
+/// Defines the types of hyperedges in the meta-hypergraph system.
+/// These extend the basic Relationship concept to support more sophisticated reasoning patterns.
+/// </summary>
+public enum HyperedgeType 
+{
+    /// <summary>
+    /// Basic relationship - equivalent to current UKS Relationships
+    /// </summary>
+    SimpleRelation = 0,
+    
+    /// <summary>
+    /// Links multiple Things simultaneously in a single hyperedge
+    /// </summary>
+    CompoundRelation = 1,
+    
+    /// <summary>
+    /// Links other Relationships (relations-between-relations)
+    /// </summary>
+    MetaRelation = 2,
+    
+    /// <summary>
+    /// "IF-THEN" conditional structures
+    /// </summary>
+    ConditionalRelation = 3,
+    
+    /// <summary>
+    /// Overrides inherited attributes with higher priority
+    /// </summary>
+    ExceptionRelation = 4,
+    
+    /// <summary>
+    /// Tracks source and confidence of facts
+    /// </summary>
+    ProvenanceRelation = 5,
+    
+    /// <summary>
+    /// Time-bounded relationships with temporal constraints
+    /// </summary>
+    TemporalRelation = 6
+}
 
 //these are used so that relatinoship lists can be readOnly.
 //This prevents programmers from accidentally doing a (e.g.) relationships.Add() which will not handle reverse links properly
@@ -394,4 +437,124 @@ public class SRelationship
     public int count = -1;
     public bool GPTVerified = false;
     public List<SClauseType>? clauses = new();
+}
+
+/// <summary>
+/// Extended relationship class that supports meta-hypergraph functionality
+/// including conditional logic, exceptions, provenance, and compound relationships.
+/// </summary>
+public class MetaRelationship : Relationship
+{
+    /// <summary>
+    /// The type of hyperedge this relationship represents
+    /// </summary>
+    public HyperedgeType HyperedgeType { get; set; } = HyperedgeType.SimpleRelation;
+    
+    /// <summary>
+    /// For compound relations - multiple target Things in a single hyperedge
+    /// </summary>
+    public List<Thing> Targets { get; set; } = new();
+    
+    /// <summary>
+    /// For meta-relations - relationships that target other relationships
+    /// </summary>
+    public List<Relationship> RelationshipTargets { get; set; } = new();
+    
+    /// <summary>
+    /// Priority for exception handling - higher priority overrides lower priority
+    /// </summary>
+    public float Priority { get; set; } = 1.0f;
+    
+    /// <summary>
+    /// Indicates if this relationship represents an exception to inherited rules
+    /// </summary>
+    public bool IsException { get; set; } = false;
+    
+    /// <summary>
+    /// Conditions that must be met for conditional relationships (IF part)
+    /// </summary>
+    public List<Relationship> Conditions { get; set; } = new();
+    
+    /// <summary>
+    /// Consequences that follow from conditional relationships (THEN part)
+    /// </summary>
+    public List<Relationship> Consequences { get; set; } = new();
+    
+    /// <summary>
+    /// Confidence level in this relationship (0.0 to 1.0)
+    /// </summary>
+    public float Confidence { get; set; } = 1.0f;
+    
+    /// <summary>
+    /// Source of this relationship for provenance tracking
+    /// </summary>
+    public string Source { get; set; } = "";
+    
+    /// <summary>
+    /// When this relationship was acquired
+    /// </summary>
+    public DateTime AcquiredAt { get; set; } = DateTime.Now;
+    
+    /// <summary>
+    /// Default constructor
+    /// </summary>
+    public MetaRelationship() : base()
+    {
+    }
+    
+    /// <summary>
+    /// Constructor from existing relationship
+    /// </summary>
+    public MetaRelationship(Relationship baseRelationship) : base(baseRelationship)
+    {
+        // Copy additional meta properties if the base is already a MetaRelationship
+        if (baseRelationship is MetaRelationship meta)
+        {
+            HyperedgeType = meta.HyperedgeType;
+            Targets = new List<Thing>(meta.Targets);
+            RelationshipTargets = new List<Relationship>(meta.RelationshipTargets);
+            Priority = meta.Priority;
+            IsException = meta.IsException;
+            Conditions = new List<Relationship>(meta.Conditions);
+            Consequences = new List<Relationship>(meta.Consequences);
+            Confidence = meta.Confidence;
+            Source = meta.Source;
+            AcquiredAt = meta.AcquiredAt;
+        }
+    }
+    
+    /// <summary>
+    /// Evaluates if all conditions for this relationship are met in the given context
+    /// </summary>
+    public bool EvaluateConditions(Dictionary<Thing, Thing> context)
+    {
+        if (HyperedgeType != HyperedgeType.ConditionalRelation)
+            return true; // Non-conditional relationships are always valid
+            
+        foreach (var condition in Conditions)
+        {
+            if (!context.ContainsKey(condition.source) || 
+                context[condition.source] != condition.target)
+            {
+                return false; // All conditions must be met
+            }
+        }
+        return true;
+    }
+    
+    /// <summary>
+    /// Gets the effective targets considering compound relationships
+    /// </summary>
+    public IEnumerable<Thing> GetEffectiveTargets()
+    {
+        if (HyperedgeType == HyperedgeType.CompoundRelation)
+        {
+            return Targets;
+        }
+        else if (target != null)
+        {
+            return new[] { target };
+        }
+        return Enumerable.Empty<Thing>();
+    }
 }

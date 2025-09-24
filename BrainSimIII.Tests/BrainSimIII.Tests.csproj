@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -10,11 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Documentation\" />
+    <PackageReference Include="MSTest" Version="4.0.0-preview.25415.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pluralize.NET" Version="1.0.2" />
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UKS\UKS.csproj" />
   </ItemGroup>
 
 </Project>

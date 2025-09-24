@@ -6,6 +6,7 @@
 using Microsoft.Msagl.Drawing;
 using Microsoft.Msagl.GraphViewerGdi;
 using System.Drawing; // for Color
+using System.Linq;
 using System.Windows;
 using UKS;
 
@@ -59,9 +60,8 @@ namespace BrainSimulator.Modules
             Thing theRoot = parent.theUKS.Labeled(root);
             foreach (Thing t in theRoot.Descendents)
             {
-                foreach (Relationship r in t.Relationships)
+                foreach (Relationship r in t.Relationships.Where(r => r.source != theRoot))
                 {
-                    if (r.source == theRoot) continue;
                     string label = r.reltype.Label;
                     foreach (Clause c in r.Clauses)
                         label += $"\n{c.clauseType.Label} {c.clause.source.Label} {c.clause.reltype.Label} {c.clause.target.Label}";
